@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 from lib.database_connection import get_flask_database_connection
 from lib.album_repository import *
 from lib.album import *
@@ -14,15 +14,14 @@ app = Flask(__name__)
 def post_album():
     connection = get_flask_database_connection(app)
     repository = AlbumRepository(connection)
-    if 'title' not in request.form:
-        return "Need more information !", 400
-
     title = request.form['title']
     release_year = request.form['release_year']
     artist_id = request.form['artist_id']   
     album = Album(None, title,release_year, artist_id)
-    repository.create(album)
-    return ""
+    if album.is_valid():
+        return redirect(f"/albums/{repository.create(album)}")
+    else:
+        return render_template("/new_album.html", errors=album.error_messages()), 400
 
 @app.route('/albums', methods = ['GET'])
 def get_albums():
@@ -38,6 +37,10 @@ def get_one_album(id):
     album = [repository.find(id)]
     return render_template('get_albums.html', albums= album)
 
+@app.route('/albums/new')
+def get_new_album():
+    return render_template('new_album.html')
+
 @app.route('/artists')
 def get_artists():
     connection = get_flask_database_connection(app)
@@ -52,8 +55,11 @@ def post_artist():
     name = request.form['name']
     genre = request.form['genre']
     artist = Artist(None, name, genre)
-    repository.create(artist)
-    return ""
+    if artist.is_valid():
+        return redirect(f"artists/{repository.create(artist)}")
+    else:
+        return render_template(f"/new_artist.html", errors= artist.error_messages())
+    
 
 @app.route('/artists/<id>')
 def get_artist_by_id(id):
@@ -61,6 +67,10 @@ def get_artist_by_id(id):
     repo = ArtistRepository(connection)
     artist = repo.find(id)
     return render_template('artist.html', artist_details = artist)
+
+@app.route('/artists/new')
+def get_new_artist():
+    return render_template('new_artist.html')
 
 # == End Example Code ==
 

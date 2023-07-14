@@ -36,3 +36,32 @@ def test_get_artists(page, test_web_address ,db_connection):
     expect(paragraph).to_have_text(
         "Artist Name: Pixies Genre: Rock"
     )
+
+'''
+I want to go on /albums and be able to add a new album
+'''
+def test_add_album(page, test_web_address ,db_connection):
+    db_connection.seed("seeds/music_library.sql")
+    page.goto(f"http://{test_web_address}/albums")
+    page.click("text=Add New Album")
+    page.fill("input[name='title']", "The Blackening")
+    page.fill("input[name='release_year']", "2008")
+    page.fill("input[name='artist_id']", "5")
+    page.click("text=Add to library")
+    paragraph_block = page.locator("div")
+    expect(paragraph_block).to_have_text(
+        'Title: The Blackening\nReleased: 2008'
+    )
+
+'''
+I want to go on /albums and be able to add a new album
+'''
+def test_add_album_no_input(page, test_web_address ,db_connection):
+    db_connection.seed("seeds/music_library.sql")
+    page.goto(f"http://{test_web_address}/albums")
+    page.click("text=Add New Album")
+    page.click("text=Add to library")
+    page_title = page.locator("h1")
+    expect(page_title).to_have_text("New Album")
+    errors = page.locator(".errors")
+    expect(errors).to_have_text("There were errors with your submission: Title can't be blank, Release year can't be blank, Artist id can't be blank")

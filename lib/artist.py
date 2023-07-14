@@ -14,3 +14,21 @@ class Artist:
     # This method makes it look nicer when we print an Artist
     def __repr__(self):
         return f"Artist({self.id}, {self.name}, {self.genre})"
+    
+    def is_valid(self):
+        list_of_properties = [self.name, self.genre]
+        if None not in list_of_properties and "" not in list_of_properties:
+            return True
+        else: 
+            return False
+        
+    def error_messages(self):
+        errors = []
+        if self.name == None or self.name == "":
+            errors.append("Name can't be blank")
+        if self.genre == None or self.genre == "":
+            errors.append("Genre can't be blank")
+        if len(errors) == 0:
+            return None
+        else:
+            return ", ".join(errors)

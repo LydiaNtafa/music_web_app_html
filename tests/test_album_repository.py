@@ -40,7 +40,7 @@ def test_create_new_album_and_get_all(db_connection):
     db_connection.seed("seeds/music_library.sql")
     repository = AlbumRepository(db_connection)
     album = Album(None, "Title1", 1999, 1)
-    assert repository.create(album) == None
+    assert repository.create(album) == 13
     assert repository.all() == [
         Album(1,'Doolittle', 1989, 1),
         Album(2,'Surfer Rosa', 1988, 1),
